@@ -65,6 +65,7 @@ struct qcom_icc_provider {
 	struct clk *bus_clk;
 	bool keep_alive;
 	bool ignore_enxio;
+	bool nodes_changed;
 	int num_intf_clks;
 	struct clk_bulk_data intf_clks[] __counted_by(num_intf_clks);
 };
@@ -117,6 +118,7 @@ struct qcom_icc_node {
 	const struct rpm_clk_resource *bus_clk_desc;
 	u64 sum_avg[QCOM_SMD_RPM_STATE_NUM];
 	u64 max_peak[QCOM_SMD_RPM_STATE_NUM];
+	u64 app_sum_avg[QCOM_SMD_RPM_STATE_NUM];
 	int mas_rpm_id;
 	int slv_rpm_id;
 	struct qcom_icc_qos qos;
