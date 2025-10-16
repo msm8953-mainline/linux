@@ -259,6 +259,7 @@ struct msm_gem_object {
 	 * torn down.
 	 */
 	atomic_t vma_ref;
+	atomic_t handle_count;
 };
 #define to_msm_bo(x) container_of(x, struct msm_gem_object, base)
 
