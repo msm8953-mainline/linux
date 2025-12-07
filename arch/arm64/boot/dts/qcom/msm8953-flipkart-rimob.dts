@@ -7,6 +7,7 @@
 #include "msm8953.dtsi"
 #include "pm8953.dtsi"
 #include "pmi8950.dtsi"
+#include "pmi8950-usb-type-b.dtsi"
 
 /delete-node/ &cont_splash_mem;
 /delete-node/ &qseecom_mem;
@@ -17,6 +18,15 @@
 	chassis-type = "handset";
 	qcom,msm-id = <293 0>;
 	qcom,board-id = <0x340008 0>;
+
+	battery: battery {
+		compatible = "simple-battery";
+
+		charge-full-design-microamp-hours = <3500000>;
+		constant-charge-current-max-microamp = <1000000>;
+		voltage-min-design-microvolt = <3400000>;
+		voltage-max-design-microvolt = <4400000>;
+	};
 
 	chosen {
 		#address-cells = <2>;
@@ -181,6 +191,26 @@
 
 &pm8953_resin {
 	linux,code = <KEY_VOLUMEDOWN>;
+	status = "okay";
+};
+
+&pmi8950_fg {
+	monitored-battery = <&battery>;
+	power-supplies = <&pmi8950_smbcharger>;
+	status = "okay";
+};
+
+&pmi8950_haptics {
+	qcom,actuator-type = <HAP_TYPE_ERM>;
+	qcom,brake-pattern = <0x3 0x3 0x0 0x0>;
+	qcom,wave-play-rate-us = <5263>;
+	qcom,wave-shape = <HAP_WAVE_SQUARE>;
+
+	status = "okay";
+};
+
+&pmi8950_smbcharger {
+	monitored-battery = <&battery>;
 	status = "okay";
 };
 
@@ -368,6 +398,7 @@
 };
 
 &usb3 {
+	usb-psy-name = "qcom-smbchg-usb";
 	status = "okay";
 };
 
