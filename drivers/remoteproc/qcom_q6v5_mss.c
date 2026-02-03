@@ -2728,6 +2728,14 @@ static const struct rproc_hexagon_res msm8953_mss = {
 		},
 		{}
 	},
+	.active_supply = (struct qcom_mss_reg_res[]) {
+		{
+			.supply = "mss",
+			.uV = 1050000,
+			.uA = 100000,
+		},
+		{}
+	},
 	.proxy_clk_names = (char*[]){
 		"xo",
 		NULL
@@ -2741,7 +2749,6 @@ static const struct rproc_hexagon_res msm8953_mss = {
 	.proxy_pd_names = (char*[]) {
 		"cx",
 		"mx",
-		"mss",
 		NULL
 	},
 	.need_mem_protection = false,
