@@ -225,7 +225,7 @@
 		dvdd-supply = <&pm8953_l23>;
 		dovdd-supply = <&pm8953_l6>;
 		orientation = <0>;
-		rotation = <270>;
+		rotation = <90>;
 
 		status = "okay";
 
