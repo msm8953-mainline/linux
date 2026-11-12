@@ -72,14 +72,6 @@
 		vin-supply = <&vph_pwr>;
 	};
 
-	/* Dummy regulator until PMI632 has LCDB VSP/VSN support */
-	lcdb_dummy: regulator-lcdb-dummy {
-		compatible = "regulator-fixed";
-		regulator-name = "lcdb_dummy";
-		regulator-min-microvolt = <5500000>;
-		regulator-max-microvolt = <5500000>;
-	};
-
 	vph_pwr: vph-pwr-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "vph_pwr";
@@ -195,8 +187,8 @@
 		reset-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 
 		iovcc-supply = <&pm8953_l6>;
-		vsn-supply = <&lcdb_dummy>;
-		vsp-supply = <&lcdb_dummy>;
+		vsn-supply = <&pmi632_lcdb_ncp>;
+		vsp-supply = <&pmi632_lcdb_ldo>;
 
 		pinctrl-0 = <&mdss_te_default>;
 		pinctrl-names = "default";
@@ -230,6 +222,20 @@
 &pm8953_resin {
 	linux,code = <KEY_VOLUMEDOWN>;
 	status = "okay";
+};
+
+&pmi632_lcdb {
+	status = "okay";
+};
+
+&pmi632_lcdb_ldo {
+	regulator-min-microvolt = <5500000>;
+	regulator-max-microvolt = <5500000>;
+};
+
+&pmi632_lcdb_ncp {
+	regulator-min-microvolt = <5500000>;
+	regulator-max-microvolt = <5500000>;
 };
 
 &pmi632_lpg {
