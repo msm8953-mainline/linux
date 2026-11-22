@@ -154,6 +154,15 @@
 				remote-endpoint = <&rear_cam_ep>;
 			};
 		};
+
+		port@2 {
+			reg = <2>;
+			csiphy2_ep: endpoint {
+				clock-lanes = <7>;
+				data-lanes = <0 1>;
+				remote-endpoint = <&front_cam_ep>;
+			};
+		};
 	};
 };
 
@@ -192,6 +201,38 @@
 			rear_cam_ep: endpoint {
 				data-lanes = <0 1 2 3>;
 				remote-endpoint = <&csiphy0_ep>;
+			};
+		};
+	};
+};
+
+&cci_i2c1 {
+	camera@2d {
+		compatible = "samsung,s5k5e8";
+		reg = <0x2d>;
+
+		clocks = <&gcc GCC_CAMSS_MCLK1_CLK>;
+		assigned-clocks = <&gcc GCC_CAMSS_MCLK1_CLK>;
+		assigned-clock-rates = <24000000>;
+
+		pinctrl-0 = <&cam_front_default>;
+		pinctrl-names = "default";
+
+		reset-gpios = <&tlmm 129 GPIO_ACTIVE_LOW>;
+		powerdown-gpios = <&tlmm 130 GPIO_ACTIVE_LOW>;
+
+		vdda-supply = <&pm8953_l22>;
+		vddd-supply = <&pm8953_l23>;
+		vddio-supply = <&pm8953_l6>;
+
+		rotation = <90>;
+		orientation = <0>;
+
+		port {
+			front_cam_ep: endpoint {
+				data-lanes = <1 2>;
+				remote-endpoint = <&csiphy2_ep>;
+				link-frequencies = /bits/ 64 <420000000>;
 			};
 		};
 	};
@@ -251,6 +292,10 @@
 	regulator-min-microvolt = <1200000>;
 };
 
+&pm8953_l23 {
+	regulator-min-microvolt = <1200000>;
+};
+
 &sdhc_2 {
 	cd-gpios = <&tlmm 133 GPIO_ACTIVE_LOW>;
 };
@@ -278,6 +323,13 @@
 
 &tlmm {
 	gpio-reserved-ranges = <0 4>, <135 4>;
+
+	cam_front_default: cam-front-default-state {
+		pins = "gpio129", "gpio130";
+		function = "gpio";
+		bias-disable;
+		drive-strength = <2>;
+	};
 };
 
 &wcd_codec {
