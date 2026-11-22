@@ -5,8 +5,8 @@
 
 #include <linux/backlight.h>
 #include <linux/delay.h>
+#include <linux/device-id/of.h>
 #include <linux/gpio/consumer.h>
-#include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/regulator/consumer.h>
 
@@ -27,6 +27,8 @@ struct boe_hx8394f {
 static const struct regulator_bulk_data boe_hx8394f_supplies[] = {
 	{ .supply = "vsn" },
 	{ .supply = "vsp" },
+	{ .supply = "vddio" },
+	{ .supply = "vdd" },
 };
 
 static inline struct boe_hx8394f *to_boe_hx8394f(struct drm_panel *panel)
@@ -234,27 +236,11 @@ static int boe_hx8394f_probe(struct mipi_dsi_device *dsi)
 		return dev_err_probe(dev, PTR_ERR(ctx->panel.backlight),
 				     "Failed to create backlight\n");
 
-	drm_panel_add(&ctx->panel);
+	ret = devm_drm_panel_add(dev, &ctx->panel);
+	if (ret)
+		return ret;
 
-	ret = mipi_dsi_attach(dsi);
-	if (ret < 0) {
-		drm_panel_remove(&ctx->panel);
-		return dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
-	}
-
-	return 0;
-}
-
-static void boe_hx8394f_remove(struct mipi_dsi_device *dsi)
-{
-	struct boe_hx8394f *ctx = mipi_dsi_get_drvdata(dsi);
-	int ret;
-
-	ret = mipi_dsi_detach(dsi);
-	if (ret < 0)
-		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
-
-	drm_panel_remove(&ctx->panel);
+	return devm_mipi_dsi_attach(dev, dsi);
 }
 
 static const struct of_device_id boe_hx8394f_of_match[] = {
@@ -265,7 +251,6 @@ MODULE_DEVICE_TABLE(of, boe_hx8394f_of_match);
 
 static struct mipi_dsi_driver boe_hx8394f_driver = {
 	.probe = boe_hx8394f_probe,
-	.remove = boe_hx8394f_remove,
 	.driver = {
 		.name = "panel-boe-hx8394f",
 		.of_match_table = boe_hx8394f_of_match,

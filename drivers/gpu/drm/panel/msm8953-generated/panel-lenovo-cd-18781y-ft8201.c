@@ -4,8 +4,8 @@
 //   Copyright (c) 2013, The Linux Foundation. All rights reserved. (FIXME)
 
 #include <linux/delay.h>
+#include <linux/device-id/of.h>
 #include <linux/gpio/consumer.h>
-#include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/regulator/consumer.h>
 
@@ -174,27 +174,11 @@ static int boyift8201_800p_probe(struct mipi_dsi_device *dsi)
 	if (ret)
 		return dev_err_probe(dev, ret, "Failed to get backlight\n");
 
-	drm_panel_add(&ctx->panel);
+	ret = devm_drm_panel_add(dev, &ctx->panel);
+	if (ret)
+		return ret;
 
-	ret = mipi_dsi_attach(dsi);
-	if (ret < 0) {
-		drm_panel_remove(&ctx->panel);
-		return dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
-	}
-
-	return 0;
-}
-
-static void boyift8201_800p_remove(struct mipi_dsi_device *dsi)
-{
-	struct boyift8201_800p *ctx = mipi_dsi_get_drvdata(dsi);
-	int ret;
-
-	ret = mipi_dsi_detach(dsi);
-	if (ret < 0)
-		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
-
-	drm_panel_remove(&ctx->panel);
+	return devm_mipi_dsi_attach(dev, dsi);
 }
 
 static const struct of_device_id boyift8201_800p_of_match[] = {
@@ -205,7 +189,6 @@ MODULE_DEVICE_TABLE(of, boyift8201_800p_of_match);
 
 static struct mipi_dsi_driver boyift8201_800p_driver = {
 	.probe = boyift8201_800p_probe,
-	.remove = boyift8201_800p_remove,
 	.driver = {
 		.name = "panel-boyift8201-800p",
 		.of_match_table = boyift8201_800p_of_match,

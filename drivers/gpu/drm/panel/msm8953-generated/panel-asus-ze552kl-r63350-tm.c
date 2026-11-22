@@ -5,8 +5,8 @@
 
 #include <linux/backlight.h>
 #include <linux/delay.h>
+#include <linux/device-id/of.h>
 #include <linux/gpio/consumer.h>
-#include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/regulator/consumer.h>
 
@@ -261,27 +261,11 @@ static int tm5p5_r63350_probe(struct mipi_dsi_device *dsi)
 		return dev_err_probe(dev, PTR_ERR(ctx->panel.backlight),
 				     "Failed to create backlight\n");
 
-	drm_panel_add(&ctx->panel);
+	ret = devm_drm_panel_add(dev, &ctx->panel);
+	if (ret)
+		return ret;
 
-	ret = mipi_dsi_attach(dsi);
-	if (ret < 0) {
-		drm_panel_remove(&ctx->panel);
-		return dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
-	}
-
-	return 0;
-}
-
-static void tm5p5_r63350_remove(struct mipi_dsi_device *dsi)
-{
-	struct tm5p5_r63350 *ctx = mipi_dsi_get_drvdata(dsi);
-	int ret;
-
-	ret = mipi_dsi_detach(dsi);
-	if (ret < 0)
-		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
-
-	drm_panel_remove(&ctx->panel);
+	return devm_mipi_dsi_attach(dev, dsi);
 }
 
 static const struct of_device_id tm5p5_r63350_of_match[] = {
@@ -292,7 +276,6 @@ MODULE_DEVICE_TABLE(of, tm5p5_r63350_of_match);
 
 static struct mipi_dsi_driver tm5p5_r63350_driver = {
 	.probe = tm5p5_r63350_probe,
-	.remove = tm5p5_r63350_remove,
 	.driver = {
 		.name = "panel-tm5p5-r63350",
 		.of_match_table = tm5p5_r63350_of_match,
