@@ -101,7 +101,6 @@
 
 &mdss_dsi0 {
 	vdda-supply = <&pm8953_s3>;
-	vddio-supply = <&pm8953_l6>;
 	status = "okay";
 
 	panel: panel@0 {
@@ -113,13 +112,10 @@
 		pinctrl-0 = <&panel_default &mdss_te_default>;
 		pinctrl-names = "default";
 
-		// Downstream:
-		// lab-supply = <&lcdb_ldo_vreg>;
-		// ibb-supply = <&lcdb_ncp_vreg>;
-
-		// lcdb driver is not yet in mainline
-		// vsp-supply = <>;
-		// vsn-supply = <>;
+		vdd-supply = <&pm8953_l17>;
+		vddio-supply = <&pm8953_l6>;
+		vsn-supply = <&pmi632_lcdb_ncp>;
+		vsp-supply = <&pmi632_lcdb_ldo>;
 
 		port {
 			panel_in: endpoint {
@@ -213,6 +209,20 @@
 	linux,code = <KEY_VOLUMEDOWN>;
 
 	status = "okay";
+};
+
+&pmi632_lcdb {
+	status = "okay";
+};
+
+&pmi632_lcdb_ldo {
+	regulator-min-microvolt = <4000000>;
+	regulator-max-microvolt = <6000000>;
+};
+
+&pmi632_lcdb_ncp {
+	regulator-min-microvolt = <4000000>;
+	regulator-max-microvolt = <6000000>;
 };
 
 &pmi632_lpg {
